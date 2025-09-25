@@ -7,6 +7,6 @@ pub mod init;
 mod trap;
 
 #[cfg(feature = "uspace")]
-pub mod uspace;
+pub(crate) mod uctx;
 
 pub use self::context::{FpState, TaskContext, TrapFrame};

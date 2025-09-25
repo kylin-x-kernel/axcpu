@@ -12,7 +12,7 @@ mod trap;
 mod syscall;
 
 #[cfg(feature = "uspace")]
-pub mod uspace;
+pub(crate) mod uctx;
 
 pub use self::context::{ExtendedState, FxsaveArea, TaskContext, TrapFrame};
 pub use self::gdt::GdtStruct;

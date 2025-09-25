@@ -6,7 +6,7 @@ use aarch64_cpu::registers::ESR_EL1;
 use memory_addr::VirtAddr;
 
 use crate::{
-    trap::{ExceptionKind, ReturnReason},
+    uspace::{ExceptionKind, ReturnReason},
     TrapFrame,
 };
 

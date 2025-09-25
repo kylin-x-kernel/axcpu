@@ -4,9 +4,11 @@ use core::ops::{Deref, DerefMut};
 
 use memory_addr::VirtAddr;
 
-use crate::asm::{read_thread_pointer, write_thread_pointer};
-use crate::trap::{ExceptionKind, ReturnReason};
-use crate::TrapFrame;
+use crate::{
+    asm::{read_thread_pointer, write_thread_pointer},
+    uspace::{ExceptionKind, ReturnReason},
+    TrapFrame,
+};
 
 /// Context to enter user space.
 pub struct UserContext(TrapFrame);

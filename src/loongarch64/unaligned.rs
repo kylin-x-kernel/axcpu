@@ -557,11 +557,6 @@ impl TrapFrame {
         let badi = core::ptr::read(self.era as *const u32);
         let rd = (badi & 0x1f) as usize;
 
-        // debug!(
-        //     "emulate unaligned access @ {:#x} badv={:#x}",
-        //     self.era, badv
-        // );
-
         let regs = unsafe {
             core::mem::transmute::<&mut GeneralRegisters, &mut [usize; 32]>(&mut self.regs)
         };

@@ -14,8 +14,11 @@ use riscv::{
     register::stval,
 };
 
-use super::{GeneralRegisters, TrapFrame};
-use crate::trap::{ExceptionKind, PageFaultFlags, ReturnReason};
+use crate::{
+    trap::PageFaultFlags,
+    uspace::{ExceptionKind, ReturnReason},
+    GeneralRegisters, TrapFrame,
+};
 
 /// Context to enter user space.
 #[derive(Debug, Clone)]

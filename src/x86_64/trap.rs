@@ -33,7 +33,7 @@ fn handle_page_fault(tf: &TrapFrame) {
 #[unsafe(no_mangle)]
 fn x86_trap_handler(tf: &mut TrapFrame) {
     #[cfg(feature = "uspace")]
-    super::uspace::switch_to_kernel_fs_base(tf);
+    super::uctx::switch_to_kernel_fs_base(tf);
     match tf.vector as u8 {
         PAGE_FAULT_VECTOR => handle_page_fault(tf),
         BREAKPOINT_VECTOR => debug!("#BP @ {:#x} ", tf.rip),
@@ -64,7 +64,7 @@ fn x86_trap_handler(tf: &mut TrapFrame) {
         }
     }
     #[cfg(feature = "uspace")]
-    super::uspace::switch_to_user_fs_base(tf);
+    super::uctx::switch_to_user_fs_base(tf);
 }
 
 fn vec_to_str(vec: u64) -> &'static str {

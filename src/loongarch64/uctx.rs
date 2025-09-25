@@ -9,7 +9,8 @@ use loongArch64::register::{
 use memory_addr::VirtAddr;
 
 use crate::{
-    trap::{ExceptionKind, PageFaultFlags, ReturnReason},
+    trap::PageFaultFlags,
+    uspace::{ExceptionKind, ReturnReason},
     TrapFrame,
 };
 

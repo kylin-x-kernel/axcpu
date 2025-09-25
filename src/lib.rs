@@ -27,3 +27,6 @@ cfg_if::cfg_if! {
         pub use self::loongarch64::*;
     }
 }
+
+#[cfg(feature = "uspace")]
+pub mod uspace;

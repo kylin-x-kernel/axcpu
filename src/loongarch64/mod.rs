@@ -9,7 +9,7 @@ pub mod asm;
 pub mod init;
 
 #[cfg(feature = "uspace")]
-pub mod uspace;
+pub(crate) mod uctx;
 
 pub use self::context::{FpuState, GeneralRegisters, TaskContext, TrapFrame};
 pub use self::unaligned::UnalignedError;
