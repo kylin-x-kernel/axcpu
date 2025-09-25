@@ -106,14 +106,19 @@ impl From<TrapFrame> for UserContext {
     }
 }
 
+/// Information about an exception that occurred in user space.
 #[derive(Debug, Clone, Copy)]
 pub struct ExceptionInfo {
+    /// The raw exception.
     pub e: Exception,
+    /// The faulting address (from `badv`).
     pub badv: usize,
+    /// The instruction causing the fault (from `badi`).
     pub badi: u32,
 }
 
 impl ExceptionInfo {
+    /// Returns a generalized kind of this exception.
     pub fn kind(&self) -> ExceptionKind {
         match self.e {
             Exception::Breakpoint => ExceptionKind::Breakpoint,

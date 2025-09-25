@@ -4,20 +4,33 @@ use crate::{trap::PageFaultFlags, TrapFrame};
 
 pub use crate::uctx::{ExceptionInfo, UserContext};
 
+/// A reason as to why the control of the CPU is returned from
+/// the user space to the kernel.
 #[derive(Debug, Clone, Copy)]
 pub enum ReturnReason {
-    Unknown,
+    /// An interrupt.
     Interrupt,
+    /// A system call.
     Syscall,
+    /// A page fault.
     PageFault(VirtAddr, PageFaultFlags),
+    /// Other kinds of exceptions.
     Exception(ExceptionInfo),
+    /// Unknown reason.
+    Unknown,
 }
 
+/// A generalized kind for [`ExceptionInfo`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ExceptionKind {
-    Other,
+    /// A breakpoint exception.
     Breakpoint,
+    /// An illegal instruction exception.
     IllegalInstruction,
+    /// A misaligned access exception.
     Misaligned,
+    /// Other kinds of exceptions.
+    Other,
 }
 
 #[repr(C)]

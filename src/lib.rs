@@ -1,6 +1,7 @@
 #![cfg_attr(not(test), no_std)]
 #![cfg_attr(docsrs, feature(doc_cfg, doc_auto_cfg))]
 #![feature(likely_unlikely)]
+#![deny(missing_docs)]
 #![doc = include_str!("../README.md")]
 
 #[macro_use]
@@ -28,5 +29,6 @@ cfg_if::cfg_if! {
     }
 }
 
+/// User mode support.
 #[cfg(feature = "uspace")]
 pub mod uspace;

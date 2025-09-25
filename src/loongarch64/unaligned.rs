@@ -13,6 +13,7 @@ extern "C" {
     fn _unaligned_write(addr: u64, value: u64, n: u64) -> i32;
 }
 
+/// Error type for unaligned access operations.
 #[derive(Copy, Eq, PartialEq, Clone, Debug)]
 pub struct UnalignedError {
     addr: u64,
