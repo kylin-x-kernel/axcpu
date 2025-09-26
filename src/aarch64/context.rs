@@ -144,6 +144,16 @@ impl TrapFrame {
         self.tpidr = tls as _;
     }
 
+    /// Get the syscall number.
+    pub const fn sysno(&self) -> usize {
+        self.r[8] as usize
+    }
+
+    /// Sets the syscall number.
+    pub const fn set_sysno(&mut self, sysno: usize) {
+        self.r[8] = sysno as _;
+    }
+
     /// Unwind the stack and get the backtrace.
     pub fn backtrace(&self) -> axbacktrace::Backtrace {
         axbacktrace::Backtrace::capture_trap(self.r[29] as _, self.elr as _, self.r[30] as _)
