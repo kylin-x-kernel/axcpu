@@ -30,7 +30,7 @@ pub struct UserContext {
 fn handle_data_abort_lower(ctx: &UserContext, iss: u64) -> ReturnReason {
     let access_flags = data_abort_access_flags(iss) | PageFaultFlags::USER;
     let vaddr = va!(FAR_EL1.get() as usize);
-    if !is_valid_page_fault(iss)
+    if !is_valid_page_fault(iss) || vaddr.as_usize() == 0
     {
         panic!(
             "Invalid Data Abort ISS {:#x} @ {:#x}, fault_vaddr={:#x}, ESR={:#x} ({:?}):\n{:#x?}\n{}",
