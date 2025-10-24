@@ -90,6 +90,10 @@ impl UserContext {
                 let esr = ESR_EL1.extract();
                 let far = FAR_EL1.get() as usize;
 
+                if far == 0 {
+                    panic!("FAR_EL1 is zero in user exception, tf={:?}, esr={:?}", self.tf, esr);
+                }
+
                 let iss = esr.read(ESR_EL1::ISS);
 
                 match esr.read_as_enum(ESR_EL1::EC) {
