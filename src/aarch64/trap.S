@@ -20,9 +20,6 @@
     mrs     x9, elr_el1
     mrs     x10, spsr_el1
     stp     x9, x10, [sp, 31 * 8]
-
-	str xzr, [sp, 33 * 8] // clean padding
-
 .endm
 
 .macro RESTORE_REGS
