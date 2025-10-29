@@ -127,7 +127,7 @@ pub fn flush_tlb(vaddr: Option<VirtAddr>) {
         #[cfg(not(feature = "arm-el2"))]
         unsafe {
             // TLB Invalidate by VA, All ASID, EL1, Inner Shareable
-            asm!("tlbi vaae1is, {}; dsb sy; isb", in(reg) operand)
+            asm!("dsb sy; isb; tlbi vaae1is, {}; dsb sy; isb", in(reg) operand)
         }
         #[cfg(feature = "arm-el2")]
         unsafe {
