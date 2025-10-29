@@ -67,20 +67,6 @@ impl UserContext {
         self.tpidr = tls as _;
     }
 
-    #[inline]
-    fn read_pan() -> bool {
-        let spsr: u64;
-        unsafe {
-            core::arch::asm!(
-                "mrs {}, SPSR_EL1",
-                out(reg) spsr,
-                options(nomem, nostack, preserves_flags)
-            );
-        }
-        // PAN 位在 bit 22
-        (spsr & (1 << 22)) != 0
-    }
-
     /// Enters user space.
     ///
     /// It restores the user registers and jumps to the user entry point
@@ -106,9 +92,6 @@ impl UserContext {
                 let far = FAR_EL1.get() as usize;
 
                 let iss = esr.read(ESR_EL1::ISS);
-
-                // output PSTATE PAN bit for debugging 
-                warn!("[uspace] PSTATE PAN: {}", Self::read_pan());
 
                 match esr.read_as_enum(ESR_EL1::EC) {
                     Some(ESR_EL1::EC::Value::SVC64) => ReturnReason::Syscall,

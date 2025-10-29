@@ -10,3 +10,5 @@ mod trap;
 pub mod uspace;
 
 pub use self::context::{FpState, TaskContext, TrapFrame};
+
+pub mod debug;

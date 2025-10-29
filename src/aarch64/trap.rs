@@ -90,6 +90,13 @@ fn aarch64_trap_handler(tf: &mut TrapFrame, kind: TrapKind, source: TrapSource) 
                 Some(ESR_EL1::EC::Value::DataAbortCurrentEL) if is_valid_page_fault(iss) => {
                     let wnr = (iss & (1 << 6)) != 0; // WnR: Write not Read
                     let cm = (iss & (1 << 8)) != 0; // CM: Cache maintenance
+                    let vaddr = FAR_EL1.get() as usize;
+
+                    if vaddr == 0x7ffefffff8e0 {
+                        warn!("Data Abort on 0x7ffefffff000 page access detected!");
+                        crate::debug::dump_full_state(vaddr, 0x60000085c5b74f);
+                    }
+
                     handle_page_fault(
                         tf,
                         if wnr & !cm {
