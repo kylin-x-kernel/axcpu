@@ -1,3 +1,10 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (C) 2025 The axcpu Authors.
+// Copyright (C) 2025 KylinSoft Co., Ltd. <https://www.kylinos.cn/>
+// See LICENSE for license details.
+// 
+// This file has been modified by KylinSoft on 2025.
+
 //! Structures and functions for user space.
 
 use core::ops::{Deref, DerefMut};
