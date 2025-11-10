@@ -11,9 +11,10 @@ authors = [
     "Su Mingxian <aarkegz@gmail.com>",
     "hky1999 <keyang.hu@qq.com>",
     "RobertYuan <634954435@qq.com>",
+    "KylinSoft Co., Ltd. <https://www.kylinos.cn/>"
 ]
 description = "Privileged instruction and structure abstractions for various CPU architectures"
-license = "GPL-3.0-or-later OR Apache-2.0 OR MulanPSL-2.0"
+license = "Apache-2.0"
 homepage = "https://github.com/arceos-org/axcpu"
 repository = "https://github.com/arceos-org/axcpu"
 documentation = "https://docs.rs/axcpu"
