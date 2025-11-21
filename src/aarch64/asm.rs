@@ -5,12 +5,16 @@ use core::arch::asm;
 use aarch64_cpu::{asm::barrier, registers::*};
 use memory_addr::{PhysAddr, VirtAddr};
 
+const ICC_PMR_EL1_ADDR : *mut u64 = 0xffff000008010004 as *mut u64;
 /// Allows the current CPU to respond to interrupts.
 ///
 /// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register.
 #[inline]
 pub fn enable_irqs() {
-    unsafe { asm!("msr daifclr, #2") };
+    unsafe { 
+        asm!("msr daifclr, #2") ;
+        core::ptr::write_volatile(ICC_PMR_EL1_ADDR, 0xff as u64);
+    }
 }
 
 /// Makes the current CPU to ignore interrupts.
@@ -18,7 +22,9 @@ pub fn enable_irqs() {
 /// In AArch64, it masks IRQs by setting the I bit in the `DAIF` register.
 #[inline]
 pub fn disable_irqs() {
-    unsafe { asm!("msr daifset, #2") };
+    unsafe {
+        core::ptr::write_volatile(ICC_PMR_EL1_ADDR, 0x80 as u64);
+    }
 }
 
 /// Returns whether the current CPU is allowed to respond to interrupts.
@@ -26,7 +32,7 @@ pub fn disable_irqs() {
 /// In AArch64, it checks the I bit in the `DAIF` register.
 #[inline]
 pub fn irqs_enabled() -> bool {
-    !DAIF.matches_all(DAIF::I::Masked)
+    (!DAIF.matches_all(DAIF::I::Masked)) && ( unsafe { core::ptr::read_volatile(ICC_PMR_EL1_ADDR) > 0xa0 } )
 }
 
 /// Relaxes the current CPU and waits for interrupts.
