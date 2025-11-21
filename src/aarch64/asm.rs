@@ -17,6 +17,17 @@ pub fn enable_irqs() {
     }
 }
 
+/// Allows the current CPU to respond to nmi.
+///
+/// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register and sets priority mask.
+#[inline]
+pub fn enable_nmi() {
+    unsafe { 
+        asm!("msr daifclr, #2") ;
+        core::ptr::write_volatile(ICC_PMR_EL1_ADDR, 0x80 as u64);
+    }
+}
+
 /// Makes the current CPU to ignore interrupts.
 ///
 /// In AArch64, it masks IRQs by setting the I bit in the `DAIF` register.
