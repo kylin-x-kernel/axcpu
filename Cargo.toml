@@ -24,12 +24,14 @@ rust-version = "1.88.0"
 [features]
 default = []
 fp-simd = []
+watchdog = ["dep:axplat"]
 tls = []
 uspace = []
 arm-el2 = []
 
 [dependencies]
 axbacktrace = "0.1"
+axplat = { version = "0.2.0", optional = true}
 linkme = "0.3"
 log = "0.4"
 cfg-if = "1.0"

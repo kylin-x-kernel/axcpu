@@ -5,42 +5,82 @@ use core::arch::asm;
 use aarch64_cpu::{asm::barrier, registers::*};
 use memory_addr::{PhysAddr, VirtAddr};
 
-const ICC_PMR_EL1_ADDR : *mut u64 = 0xffff000008010004 as *mut u64;
 /// Allows the current CPU to respond to interrupts.
 ///
 /// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register.
+#[cfg(not(feature = "watchdog"))]
 #[inline]
 pub fn enable_irqs() {
-    unsafe { 
-        asm!("msr daifclr, #2") ;
-        core::ptr::write_volatile(ICC_PMR_EL1_ADDR, 0xff as u64);
-    }
-}
-
-/// Allows the current CPU to respond to nmi.
-///
-/// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register and sets priority mask.
-#[inline]
-pub fn enable_nmi() {
-    unsafe { 
-        asm!("msr daifclr, #2") ;
-        core::ptr::write_volatile(ICC_PMR_EL1_ADDR, 0x80 as u64);
-    }
+    unsafe { asm!("msr daifclr, #2") };
 }
 
 /// Makes the current CPU to ignore interrupts.
 ///
 /// In AArch64, it masks IRQs by setting the I bit in the `DAIF` register.
+#[cfg(not(feature = "watchdog"))]
 #[inline]
 pub fn disable_irqs() {
-    unsafe {
-        core::ptr::write_volatile(ICC_PMR_EL1_ADDR, 0x80 as u64);
-    }
+    unsafe { asm!("msr daifset, #2") };
 }
 
 /// Returns whether the current CPU is allowed to respond to interrupts.
 ///
-/// In AArch64, it checks the I bit in the `DAIF` register.
+/// In AArch64, it checks the I bit in the `DAIF` register
+#[cfg(not(feature = "watchdog"))]
+#[inline]
+pub fn irqs_enabled() -> bool {
+    !DAIF.matches_all(DAIF::I::Masked)
+}
+
+#[cfg(feature = "watchdog")]
+const ICC_PMR_EL1_ADDR : *mut u64 = 0xffff000008010004 as *mut u64;
+
+/// Allows the current CPU to respond to interrupts.
+///
+/// When built with the "watchdog" feature we both clear the DAIF I bit and
+/// lower the GIC priority mask so normal interrupts can be delivered.
+/// This calls axplat::irq::set_priority_mask(0xff) to permit all priorities.
+#[cfg(feature = "watchdog")]
+#[inline]
+pub fn enable_irqs() {
+    unsafe { 
+        asm!("msr daifclr, #2");
+    }
+    axplat::irq::set_priority_mask(0xff);
+}
+
+/// Allows the current CPU to respond to NMI.
+///
+/// With the "watchdog" feature we clear the DAIF I bit and set the GIC
+/// priority mask to a value (0x80) that permits high-priority NMIs while
+/// keeping lower-priority IRQs masked.
+#[cfg(feature = "watchdog")]
+#[inline]
+pub fn enable_nmi() {
+    unsafe { 
+        asm!("msr daifclr, #2");
+    }
+    axplat::irq::set_priority_mask(0x80);
+}
+
+/// Makes the current CPU ignore interrupts.
+///
+/// Under the "watchdog" feature we do not rely solely on DAIF masking:
+/// instead we raise the GIC priority mask (via set_priority_mask(0x80))
+/// to block normal IRQs while still allowing higher-priority events (e.g. NMIs).
+#[cfg(feature = "watchdog")]
+#[inline]
+pub fn disable_irqs() {
+    axplat::irq::set_priority_mask(0x80);
+}
+
+/// Returns whether the current CPU is allowed to respond to interrupts.
+///
+/// When "watchdog" is enabled this checks both the DAIF I-bit and the GIC
+/// priority mask (ICC_PMR_EL1). The code reads ICC_PMR_EL1 and compares
+/// against 0xa0 to determine whether the current priority threshold allows
+/// delivery of IRQs.
+#[cfg(feature = "watchdog")]
 #[inline]
 pub fn irqs_enabled() -> bool {
     (!DAIF.matches_all(DAIF::I::Masked)) && ( unsafe { core::ptr::read_volatile(ICC_PMR_EL1_ADDR) > 0xa0 } )
