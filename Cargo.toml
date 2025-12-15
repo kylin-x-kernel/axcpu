@@ -27,6 +27,7 @@ fp-simd = []
 tls = []
 uspace = []
 arm-el2 = []
+gic-priority-mask = []
 
 [dependencies]
 axbacktrace = "0.1"

@@ -8,17 +8,47 @@ use memory_addr::{PhysAddr, VirtAddr};
 /// Allows the current CPU to respond to interrupts.
 ///
 /// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register.
+#[cfg(not(feature = "gic-priority-mask"))]
 #[inline]
 pub fn enable_irqs() {
+    // Default implementation: via DAIF register
     unsafe { asm!("msr daifclr, #2") };
 }
 
-/// Makes the current CPU to ignore interrupts.
+/// Makes the current CPU ignore interrupts.
 ///
 /// In AArch64, it masks IRQs by setting the I bit in the `DAIF` register.
+#[cfg(not(feature = "gic-priority-mask"))]
 #[inline]
 pub fn disable_irqs() {
+    // Default implementation: via DAIF register
     unsafe { asm!("msr daifset, #2") };
+}
+
+/// Allows the current CPU to respond to interrupts.
+///
+/// In AArch64, it unmasks IRQs by setting the priority mask to 0xFF
+/// (lowest priority) in the `ICC_PMR_EL1` register.
+#[cfg(feature = "gic-priority-mask")]
+#[inline]
+pub fn enable_irqs() {
+    // Use GIC priority mask control
+    unsafe { asm!("msr ICC_PMR_EL1, {}", in(reg) 0xFFu8) };
+    // Optional: also clear the I bit in DAIF register
+    unsafe { asm!("msr daifclr, #2") };
+}
+
+/// Makes the current CPU ignore interrupts.
+///
+/// In AArch64, it masks IRQs by setting the priority mask to 0x80
+/// (high priority) in the `ICC_PMR_EL1` register.
+#[cfg(feature = "gic-priority-mask")]
+#[inline]
+pub fn disable_irqs() {
+    // Use GIC priority mask control
+    unsafe { asm!("msr ICC_PMR_EL1, {}", in(reg) 0x80u8) };
+    // Optional: also clear the I bit in DAIF register
+    unsafe { asm!("msr daifclr, #2") };
 }
 
 /// Returns whether the current CPU is allowed to respond to interrupts.
