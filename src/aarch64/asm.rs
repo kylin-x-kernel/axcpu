@@ -33,7 +33,7 @@ pub fn disable_irqs() {
 #[inline]
 pub fn enable_irqs() {
     // Use GIC priority mask control
-    unsafe { asm!("msr ICC_PMR_EL1, {}", in(reg) 0xFFu8) };
+    axplat::irq::set_priority_mask(0xff);
     // Optional: also clear the I bit in DAIF register
     unsafe { asm!("msr daifclr, #2") };
 }
@@ -46,7 +46,7 @@ pub fn enable_irqs() {
 #[inline]
 pub fn disable_irqs() {
     // Use GIC priority mask control
-    unsafe { asm!("msr ICC_PMR_EL1, {}", in(reg) 0x80u8) };
+    axplat::irq::set_priority_mask(0x80);
     // Optional: also clear the I bit in DAIF register
     unsafe { asm!("msr daifclr, #2") };
 }
