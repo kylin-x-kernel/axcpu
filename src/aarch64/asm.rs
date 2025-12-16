@@ -37,7 +37,7 @@ const GICC_PMR: usize = 0xffff_0000_0800_0004;
 #[inline]
 pub fn enable_irqs() {
     // Use GIC priority mask control
-    axplat::irq::set_priority_mask(0xff);
+    unsafe { core::ptr::write_volatile((GICC_PMR) as *mut u32, 0xffu32) };
     // Optional: also clear the I bit in DAIF register
     unsafe { asm!("msr daifclr, #2") };
 }
@@ -50,6 +50,7 @@ pub fn enable_irqs() {
 #[inline]
 pub fn disable_irqs() {
     // Use GIC priority mask control
+    unsafe { core::ptr::write_volatile((GICC_PMR) as *mut u32, 0x80u32) };
     // Optional: also clear the I bit in DAIF register
     unsafe { asm!("msr daifclr, #2") };
 }
