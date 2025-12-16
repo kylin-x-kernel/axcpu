@@ -8,7 +8,7 @@ use memory_addr::{PhysAddr, VirtAddr};
 /// Allows the current CPU to respond to interrupts.
 ///
 /// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register.
-#[cfg(not(feature = "gic-priority-mask"))]
+#[cfg(not(feature = "pmr"))]
 #[inline]
 pub fn enable_irqs() {
     // Default implementation: via DAIF register
@@ -18,18 +18,22 @@ pub fn enable_irqs() {
 /// Makes the current CPU ignore interrupts.
 ///
 /// In AArch64, it masks IRQs by setting the I bit in the `DAIF` register.
-#[cfg(not(feature = "gic-priority-mask"))]
+#[cfg(not(feature = "pmr"))]
 #[inline]
 pub fn disable_irqs() {
     // Default implementation: via DAIF register
     unsafe { asm!("msr daifset, #2") };
 }
 
+/// Only can be used on qemu virt now
+#[cfg(feature = "pmr")]
+const GICC_PMR: usize = 0xffff_0000_0800_0004;
+
 /// Allows the current CPU to respond to interrupts.
 ///
 /// In AArch64, it unmasks IRQs by setting the priority mask to 0xFF
 /// (lowest priority) in the `ICC_PMR_EL1` register.
-#[cfg(feature = "gic-priority-mask")]
+#[cfg(feature = "pmr")]
 #[inline]
 pub fn enable_irqs() {
     // Use GIC priority mask control
@@ -42,11 +46,10 @@ pub fn enable_irqs() {
 ///
 /// In AArch64, it masks IRQs by setting the priority mask to 0x80
 /// (high priority) in the `ICC_PMR_EL1` register.
-#[cfg(feature = "gic-priority-mask")]
+#[cfg(feature = "pmr")]
 #[inline]
 pub fn disable_irqs() {
     // Use GIC priority mask control
-    axplat::irq::set_priority_mask(0x80);
     // Optional: also clear the I bit in DAIF register
     unsafe { asm!("msr daifclr, #2") };
 }
@@ -54,9 +57,17 @@ pub fn disable_irqs() {
 /// Returns whether the current CPU is allowed to respond to interrupts.
 ///
 /// In AArch64, it checks the I bit in the `DAIF` register.
+#[cfg(not(feature = "pmr"))]
 #[inline]
 pub fn irqs_enabled() -> bool {
     !DAIF.matches_all(DAIF::I::Masked)
+}
+
+/// Returns whether the current CPU is allowed to respond to interrupts.
+#[cfg(feature = "pmr")]
+#[inline]
+pub fn irqs_enabled() -> bool {
+    (!DAIF.matches_all(DAIF::I::Masked)) && unsafe {core::ptr::read_volatile((GICC_PMR) as *const u32) as u8} > 0xa0;
 }
 
 /// Relaxes the current CPU and waits for interrupts.
