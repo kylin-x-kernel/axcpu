@@ -68,7 +68,7 @@ pub fn irqs_enabled() -> bool {
 #[cfg(feature = "pmr")]
 #[inline]
 pub fn irqs_enabled() -> bool {
-    (!DAIF.matches_all(DAIF::I::Masked)) && unsafe {core::ptr::read_volatile((GICC_PMR) as *const u32) as u8} > 0xa0;
+    (!DAIF.matches_all(DAIF::I::Masked)) && unsafe {core::ptr::read_volatile((GICC_PMR) as *const u32) as u8} > 0xa0
 }
 
 /// Relaxes the current CPU and waits for interrupts.
