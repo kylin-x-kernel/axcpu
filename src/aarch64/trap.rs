@@ -78,6 +78,15 @@ fn aarch64_trap_handler(tf: &mut TrapFrame, kind: TrapKind, source: TrapSource) 
             panic!("Unhandled exception {:?}:\n{:#x?}", kind, tf);
         }
         TrapKind::Irq => {
+            #[cfg(feature = "pmr")]{
+                let irq_num: u32;
+                unsafe {
+                    core::arch::asm!("mrs {0}, ICC_IAR1_EL1",out(reg) irq_num);
+                }
+                if irq_num == 23{
+                    asm::disable_irqs();
+                }
+            }
             handle_trap!(IRQ, 0);
         }
         TrapKind::Synchronous => {
