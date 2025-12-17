@@ -79,12 +79,11 @@ fn aarch64_trap_handler(tf: &mut TrapFrame, kind: TrapKind, source: TrapSource) 
         }
         TrapKind::Irq => {
             #[cfg(feature = "pmr")]{
-                let irq_num: u32;
-                unsafe {
-                    core::arch::asm!("mrs {0}, ICC_IAR1_EL1",out(reg) irq_num);
-                }
-                if irq_num == 23{
-                    asm::disable_irqs();
+                /// Only can be used on aarch64 qemu virt now
+                const GICC_PMR: usize = 0xffff_0000_0800_000b;
+                let irq_num: u32 = unsafe { core::ptr::read_volatile((GICC_IAR) as *mut u32, irq_num) };
+                if irq_num != 23{
+                    crate::asm::disable_irqs();
                 }
             }
             handle_trap!(IRQ, 0);
