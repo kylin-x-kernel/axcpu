@@ -78,14 +78,6 @@ fn aarch64_trap_handler(tf: &mut TrapFrame, kind: TrapKind, source: TrapSource) 
             panic!("Unhandled exception {:?}:\n{:#x?}", kind, tf);
         }
         TrapKind::Irq => {
-            #[cfg(feature = "pmr")]{
-                /// Only can be used on aarch64 qemu virt now
-                const GICC_IAR: usize = 0xffff_0000_0800_000c;
-                let irq_num: u32 = unsafe { core::ptr::read_volatile((GICC_IAR) as *mut u32) };
-                if irq_num != 23{
-                    crate::asm::disable_irqs();
-                }
-            }
             handle_trap!(IRQ, 0);
         }
         TrapKind::Synchronous => {
