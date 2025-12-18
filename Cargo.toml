@@ -27,10 +27,10 @@ fp-simd = []
 tls = []
 uspace = []
 arm-el2 = []
-pmr = []
 
 [dependencies]
 axbacktrace = "0.1"
+axplat = "0.3.0"
 linkme = "0.3"
 log = "0.4"
 cfg-if = "1.0"
