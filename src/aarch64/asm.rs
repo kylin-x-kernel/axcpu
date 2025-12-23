@@ -4,7 +4,7 @@ use core::arch::asm;
 
 use aarch64_cpu::{asm::barrier, registers::*};
 use memory_addr::{PhysAddr, VirtAddr};
-use axplat::irq::{enable_irqs, disable_irqs, irqs_enabled};
+pub use axplat::irq::{enable_irqs, disable_irqs, irqs_enabled};
 
 /// Relaxes the current CPU and waits for interrupts.
 ///
