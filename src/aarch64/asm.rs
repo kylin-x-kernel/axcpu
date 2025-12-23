@@ -4,30 +4,7 @@ use core::arch::asm;
 
 use aarch64_cpu::{asm::barrier, registers::*};
 use memory_addr::{PhysAddr, VirtAddr};
-
-/// Allows the current CPU to respond to interrupts.
-///
-/// In AArch64, it unmasks IRQs by clearing the I bit in the `DAIF` register.
-#[inline]
-pub fn enable_irqs() {
-    unsafe { asm!("msr daifclr, #2") };
-}
-
-/// Makes the current CPU to ignore interrupts.
-///
-/// In AArch64, it masks IRQs by setting the I bit in the `DAIF` register.
-#[inline]
-pub fn disable_irqs() {
-    unsafe { asm!("msr daifset, #2") };
-}
-
-/// Returns whether the current CPU is allowed to respond to interrupts.
-///
-/// In AArch64, it checks the I bit in the `DAIF` register.
-#[inline]
-pub fn irqs_enabled() -> bool {
-    !DAIF.matches_all(DAIF::I::Masked)
-}
+use axplat::irq::{enable_irqs, disable_irqs, irqs_enabled};
 
 /// Relaxes the current CPU and waits for interrupts.
 ///
