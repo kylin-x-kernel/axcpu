@@ -32,3 +32,33 @@ cfg_if::cfg_if! {
         pub use self::loongarch64::*;
     }
 }
+
+/// Control the interrupt state of the current CPU.
+#[crate_interface::def_interface]
+pub trait IrqCtlIf {
+    /// Disable all interrupts on the current CPU.
+    fn disable_irqs();
+
+    /// Enable all interrupts on the current CPU.
+    fn enable_irqs();
+
+    /// Check if interrupts are currently enabled on the current CPU.
+    fn irqs_enabled() -> bool;
+}
+
+use crate_interface::call_interface;
+
+/// Disable all interrupts on the current CPU.
+pub fn disable_irqs() {
+    call_interface!(IrqCtlIf::disable_irqs);
+}
+
+/// Enable all interrupts on the current CPU.
+pub fn enable_irqs() {
+    call_interface!(IrqCtlIf::enable_irqs);
+}
+
+/// Check if interrupts are currently enabled on the current CPU.
+pub fn irqs_enabled() -> bool {
+    call_interface!(IrqCtlIf::irqs_enabled)
+}

@@ -78,7 +78,7 @@ fn aarch64_trap_handler(tf: &mut TrapFrame, kind: TrapKind, source: TrapSource) 
             panic!("Unhandled exception {:?}:\n{:#x?}", kind, tf);
         }
         TrapKind::Irq => {
-            handle_trap!(IRQ, 0);
+            handle_trap!(IRQ, 0, tf);
         }
         TrapKind::Synchronous => {
             let esr = ESR_EL1.extract();

@@ -83,7 +83,7 @@ impl UserContext {
 
         let ret = match kind {
             TrapKind::Irq => {
-                handle_trap!(IRQ, 0);
+                handle_trap!(IRQ, 0, &TrapFrame::default());
                 ReturnReason::Interrupt
             }
             TrapKind::Fiq | TrapKind::SError => ReturnReason::Unknown,

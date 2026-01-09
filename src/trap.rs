@@ -9,7 +9,7 @@ pub use page_table_entry::MappingFlags as PageFaultFlags;
 
 /// A slice of IRQ handler functions.
 #[def_trap_handler]
-pub static IRQ: [fn(usize) -> bool];
+pub static IRQ: [fn(usize, &TrapFrame) -> bool];
 
 /// A slice of page fault handler functions.
 #[def_trap_handler]
