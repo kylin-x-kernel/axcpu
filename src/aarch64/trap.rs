@@ -64,6 +64,7 @@ fn handle_page_fault(tf: &mut TrapFrame, access_flags: PageFaultFlags) {
 
 #[unsafe(no_mangle)]
 fn aarch64_trap_handler(tf: &mut TrapFrame, kind: TrapKind, source: TrapSource) {
+    let _tf_guard = crate::TrapFrameGuard::new(tf);
     if matches!(
         source,
         TrapSource::CurrentSpEl0 | TrapSource::LowerAArch64 | TrapSource::LowerAArch32

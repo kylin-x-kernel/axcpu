@@ -41,6 +41,7 @@ fn handle_page_fault(tf: &mut TrapFrame) {
 
 #[unsafe(no_mangle)]
 fn x86_trap_handler(tf: &mut TrapFrame) {
+    let _tf_guard = crate::TrapFrameGuard::new(tf);
     match tf.vector as u8 {
         PAGE_FAULT_VECTOR => handle_page_fault(tf),
         BREAKPOINT_VECTOR => debug!("#BP @ {:#x} ", tf.rip),

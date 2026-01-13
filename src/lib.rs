@@ -14,6 +14,10 @@ extern crate memory_addr;
 #[macro_use]
 pub mod trap;
 
+mod active_trapframe;
+
+pub use active_trapframe::{active_trap_frame, with_active_trap_frame, TrapFrameGuard};
+
 #[cfg(feature = "uspace")]
 mod uspace_common;
 
