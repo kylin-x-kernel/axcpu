@@ -39,6 +39,7 @@ fn handle_page_fault(tf: &mut TrapFrame, access_flags: PageFaultFlags) {
 
 #[unsafe(no_mangle)]
 fn loongarch64_trap_handler(tf: &mut TrapFrame) {
+    let _tf_guard = crate::TrapFrameGuard::new(tf);
     let estat = estat::read();
 
     match estat.cause() {

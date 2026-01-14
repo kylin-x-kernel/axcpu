@@ -40,6 +40,7 @@ fn handle_page_fault(tf: &mut TrapFrame, access_flags: PageFaultFlags) {
 
 #[unsafe(no_mangle)]
 fn riscv_trap_handler(tf: &mut TrapFrame) {
+    let _tf_guard = crate::TrapFrameGuard::new(tf);
     let scause = scause::read();
     if let Ok(cause) = scause.cause().try_into::<I, E>() {
         match cause {
